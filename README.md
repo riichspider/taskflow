@@ -13,7 +13,7 @@
 
 ## ✨ Demonstração
 
-**[🔗 Acesse o projeto online](https://taskflow-roan.vercel.app)** *(em breve)*
+Para testar localmente, abra o arquivo `index.html` no navegador ou use um servidor local.
 
 ```
 🎮 Crie tarefas → Complete → Ganhe XP → Suba de nível → Desbloqueie conquistas!
