@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TaskFlow - Sistema de tarefas gamificado com XP, níveis, conquistas e Pomodoro">
+    <meta name="theme-color" content="#667eea">
+    <title>TaskFlow - Organize sua Vida</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <a href="#main-content" class="sr-only">Pular para o conteúdo principal</a>
+    
+    <div class="app-container">
+        <header class="header" role="banner">
+            <div class="header-top">
+                <div>
+                    <div class="streak-badge" role="status" aria-live="polite">
+                        🔥 <span id="streakCount">0</span> dias de sequência!
+                    </div>
+                    <h1>✨ TaskFlow</h1>
+                </div>
+                <button class="theme-toggle" 
+                        id="themeToggle" 
+                        aria-label="Alternar modo escuro"
+                        title="Alternar tema">
+                    🌓
+                </button>
+            </div>
+            <div class="xp-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Progresso de XP">
+                <div class="xp-fill" id="xpFill"></div>
+            </div>
+            <div class="level-info">
+                <span>Nível <span id="levelNum">1</span></span>
+                <span><span id="xpNum">0</span> / <span id="xpMax">100</span> XP</span>
+            </div>
+        </header>
+
+        <nav class="stats-bar" role="tablist" aria-label="Estatísticas de tarefas">
+            <button class="stat-item active" data-filter="all" role="tab" aria-selected="true" tabindex="0">
+                <div class="stat-value" id="totalCount">0</div>
+                <div class="stat-label">Total</div>
+            </button>
+            <button class="stat-item" data-filter="pending" role="tab" aria-selected="false" tabindex="0">
+                <div class="stat-value" id="pendingCount">0</div>
+                <div class="stat-label">Pendentes</div>
+            </button>
+            <button class="stat-item" data-filter="completed" role="tab" aria-selected="false" tabindex="0">
+                <div class="stat-value" id="completedCount">0</div>
+                <div class="stat-label">Concluídas</div>
+            </button>
+        </nav>
+
+        <main class="main-content" id="main-content" role="main">
+            <section class="pomodoro-section" aria-label="Timer Pomodoro">
+                <div class="pomodoro-timer">
+                    <svg class="progress-ring" aria-hidden="true">
+                        <circle class="bg" cx="30" cy="30" r="25"></circle>
+                        <circle class="progress" id="progressCircle" cx="30" cy="30" r="25" stroke-dasharray="157" stroke-dashoffset="157"></circle>
+                    </svg>
+                    <div class="timer-display" id="timerDisplay" role="timer" aria-label="Timer Pomodoro">25:00</div>
+                </div>
+                <div class="pomodoro-btns">
+                    <button class="start" id="timerToggle" aria-label="Iniciar ou pausar timer">▶ Iniciar</button>
+                    <button class="reset" id="timerReset" aria-label="Reiniciar timer">↺</button>
+                </div>
+            </section>
+
+            <section class="achievements-panel" aria-label="Conquistas">
+                <h3>🏆 Conquistas</h3>
+                <div class="achievements-grid" id="achievementsGrid" role="list" aria-label="Lista de conquistas"></div>
+            </section>
+
+            <div class="search-box">
+                <label for="searchInput" class="sr-only">Buscar tarefas</label>
+                <input type="text" id="searchInput" placeholder="Buscar tarefas..." aria-label="Buscar tarefas">
+            </div>
+
+            <form class="input-section" onsubmit="event.preventDefault();">
+                <label for="taskInput" class="sr-only">Nova tarefa</label>
+                <input type="text" id="taskInput" class="task-input" placeholder="O que você precisa fazer?" aria-required="true">
+                
+                <div class="select-group">
+                    <label for="prioritySelect" class="sr-only">Prioridade</label>
+                    <select id="prioritySelect" aria-label="Selecionar prioridade">
+                        <option value="baixa">☕ Baixa</option>
+                        <option value="media">⚡ Média</option>
+                        <option value="alta">🔥 Alta</option>
+                    </select>
+                    
+                    <label for="categorySelect" class="sr-only">Categoria</label>
+                    <select id="categorySelect" aria-label="Selecionar categoria">
+                        <option value="pessoal">👤 Pessoal</option>
+                        <option value="trabalho">💼 Trabalho</option>
+                        <option value="estudos">📚 Estudos</option>
+                        <option value="saude">❤️ Saúde</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="add-btn" id="addBtn" aria-label="Adicionar nova tarefa">
+                    <span aria-hidden="true">+</span> Adicionar
+                </button>
+            </form>
+
+            <div class="filter-tabs" role="tablist" aria-label="Filtrar tarefas">
+                <button class="filter-tab active" data-filter="all" role="tab" aria-selected="true" tabindex="0">Todas</button>
+                <button class="filter-tab" data-filter="pending" role="tab" aria-selected="false" tabindex="0">Pendentes</button>
+                <button class="filter-tab" data-filter="completed" role="tab" aria-selected="false" tabindex="0">Concluídas</button>
+            </div>
+
+            <ul class="task-list" id="taskList" role="list" aria-label="Lista de tarefas"></ul>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="editModal" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+        <div class="modal">
+            <h2 id="editModalTitle">✏️ Editar Tarefa</h2>
+            <label for="editInput" class="sr-only">Novo texto da tarefa</label>
+            <input type="text" id="editInput">
+            
+            <label for="editPriority" class="sr-only">Nova prioridade</label>
+            <select id="editPriority">
+                <option value="baixa">☕ Baixa</option>
+                <option value="media">⚡ Média</option>
+                <option value="alta">🔥 Alta</option>
+            </select>
+            
+            <label for="editCategory" class="sr-only">Nova categoria</label>
+            <select id="editCategory">
+                <option value="pessoal">👤 Pessoal</option>
+                <option value="trabalho">💼 Trabalho</option>
+                <option value="estudos">📚 Estudos</option>
+                <option value="saude">❤️ Saúde</option>
+            </select>
+            
+            <div class="modal-btns">
+                <button class="btn-cancel" id="cancelEdit">Cancelar</button>
+                <button class="btn-save" id="saveEdit">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="confirmModal" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+        <div class="modal">
+            <h2 id="confirmModalTitle">🗑️ Confirmar Exclusão</h2>
+            <p style="margin-bottom: 20px; color: var(--text-secondary);">Tem certeza que deseja excluir esta tarefa?</p>
+            <div class="modal-btns">
+                <button class="btn-cancel" id="cancelDelete">Cancelar</button>
+                <button class="btn-confirm" id="confirmDelete">Excluir</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/storageService.js"></script>
+    <script src="js/taskService.js"></script>
+    <script src="js/gamificationService.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
